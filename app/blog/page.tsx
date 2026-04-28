@@ -1,43 +1,63 @@
-import Link from "next/link";
-import { getPublishedBlogPosts } from "@/lib/blog";
+import { supabase } from "@/lib/supabase";
 
 export default async function BlogPage() {
-  const posts = await getPublishedBlogPosts(24, 0);
+  let safeArticles: any[] = [];
+
+  if (supabase) {
+    const { data: articles } = await supabase
+      .from("articles")
+      .select("id,slug,title,excerpt,created_at")
+      .eq("domain", "comparateur-internet.fr")
+      .order("created_at", { ascending: false });
+    safeArticles = articles || [];
+  }
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      <header className="mb-8">
-        <p className="text-sm text-slate-500">Blog</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
-          Tous les articles
+    <div className="mx-auto max-w-7xl px-4 py-16">
+      <div className="text-center">
+        <h1
+          className="text-4xl font-bold text-[#0f172a]"
+          style={{ fontFamily: "var(--font-space-grotesk)" }}
+        >
+          Actualités télécom
         </h1>
-      </header>
+        <p className="mx-auto mt-4 max-w-2xl text-[#64748b]">
+          Les dernières nouvelles du marché des télécoms : promotions, nouvelles offres, couverture réseau et analyses.
+        </p>
+      </div>
 
-      {posts.length === 0 ? (
-        <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">
-          Aucun article publié.
-        </div>
-      ) : (
-        <ul className="space-y-4">
-          {posts.map((post) => (
-            <li key={post.id} className="rounded-lg border border-slate-200 bg-white p-5">
-              <h2 className="text-lg font-semibold text-slate-900">
-                <Link href={`/blog/${post.slug}`} className="hover:underline">
-                  {post.h1 || post.seo_title || post.slug}
-                </Link>
-              </h2>
-              {post.meta_description ? (
-                <p className="mt-2 text-slate-600">{post.meta_description}</p>
-              ) : null}
-              <p className="mt-3 text-xs text-slate-500">
-                {post.published_at
-                  ? new Date(post.published_at).toLocaleDateString("fr-FR")
-                  : "Date inconnue"}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+      <div className="mt-12">
+        {safeArticles.length === 0 ? (
+          <div className="rounded-2xl border border-[#e2e8f0] bg-white py-20 text-center">
+            <p className="text-lg text-[#64748b]">
+              Aucun article pour le moment.
+            </p>
+            <p className="mt-2 text-sm text-[#64748b]">
+              Revenez bientôt pour découvrir nos actualités.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {safeArticles.map((article: any) => (
+              <a
+                key={article.id}
+                href={`/blog/${article.slug}`}
+                className="rounded-2xl border border-[#e2e8f0] bg-white p-6 transition-shadow hover:shadow-lg"
+              >
+                <h2 className="text-lg font-bold text-[#0f172a]">
+                  {article.title}
+                </h2>
+                <p className="mt-2 text-sm text-[#64748b]">
+                  {article.excerpt || ""}
+                </p>
+                <span className="mt-4 inline-block text-sm font-medium text-[#0ea5e9]">
+                  Lire l’article
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

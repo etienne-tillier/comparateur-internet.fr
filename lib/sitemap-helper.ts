@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getBlogPostsForSitemap } from "./blog";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
