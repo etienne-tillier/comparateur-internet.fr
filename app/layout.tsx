@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   title: "Comparateur Internet 2025 : Meilleures Offres Box & Mobile",
   description:
     "Comparez toutes les offres internet en France : Orange, Free, SFR, Bouygues. Trouvez la meilleure box et forfait mobile selon votre région.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
   openGraph: {
     title: "Comparateur Internet France - Meilleures Offres 2025",
     description:
