@@ -1,7 +1,15 @@
 import { supabase } from "@/lib/supabase";
 
+interface Article {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  created_at: string;
+}
+
 export default async function BlogPage() {
-  let safeArticles: any[] = [];
+  let safeArticles: Article[] = [];
 
   if (supabase) {
     const { data: articles } = await supabase
@@ -9,7 +17,7 @@ export default async function BlogPage() {
       .select("id,slug,title,excerpt,created_at")
       .eq("domain", "comparateur-internet.fr")
       .order("created_at", { ascending: false });
-    safeArticles = articles || [];
+    safeArticles = (articles as Article[]) || [];
   }
 
   return (
@@ -38,7 +46,7 @@ export default async function BlogPage() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {safeArticles.map((article: any) => (
+            {safeArticles.map((article) => (
               <a
                 key={article.id}
                 href={`/blog/${article.slug}`}
