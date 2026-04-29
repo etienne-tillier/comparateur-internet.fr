@@ -1,5 +1,9 @@
 import { notFound } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+
+import { getBlogPostBySlug } from "@/lib/blog";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function ArticlePage({
   params,
@@ -7,17 +11,7 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
-  if (!supabase) {
-    notFound();
-  }
-
-  const { data: article } = await supabase
-    .from("articles")
-    .select("title,content,created_at")
-    .eq("slug", slug)
-    .eq("domain", "comparateur-internet.fr")
-    .single();
+  const article = await getBlogPostBySlug(slug);
 
   if (!article) {
     notFound();
@@ -29,16 +23,21 @@ export default async function ArticlePage({
         className="text-4xl font-bold text-[#0f172a]"
         style={{ fontFamily: "var(--font-space-grotesk)" }}
       >
-        {article.title}
+        {article.h1 || article.seo_title || article.slug}
       </h1>
-      {article.created_at && (
+      {article.published_at && (
         <p className="mt-2 text-sm text-[#64748b]">
           Publié le{" "}
-          {new Date(article.created_at).toLocaleDateString("fr-FR")}
+          {new Date(article.published_at).toLocaleDateString("fr-FR")}
         </p>
       )}
-      <div className="mt-8 whitespace-pre-line text-[#0f172a]">
-        {article.content || ""}
+      {article.meta_description && (
+        <p className="mt-6 text-lg leading-8 text-[#475569]">
+          {article.meta_description}
+        </p>
+      )}
+      <div className="mt-8 whitespace-pre-wrap leading-8 text-[#0f172a]">
+        {article.body_md || article.excerpt || ""}
       </div>
     </div>
   );

@@ -1,16 +1,12 @@
-import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+
+import { getPublishedBlogPosts } from "@/lib/blog";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function BlogPage() {
-  let safeArticles: any[] = [];
-
-  if (supabase) {
-    const { data: articles } = await supabase
-      .from("articles")
-      .select("id,slug,title,excerpt,created_at")
-      .eq("domain", "comparateur-internet.fr")
-      .order("created_at", { ascending: false });
-    safeArticles = articles || [];
-  }
+  const posts = await getPublishedBlogPosts(24, 0);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-16">
@@ -27,7 +23,7 @@ export default async function BlogPage() {
       </div>
 
       <div className="mt-12">
-        {safeArticles.length === 0 ? (
+        {posts.length === 0 ? (
           <div className="rounded-2xl border border-[#e2e8f0] bg-white py-20 text-center">
             <p className="text-lg text-[#64748b]">
               Aucun article pour le moment.
@@ -38,22 +34,29 @@ export default async function BlogPage() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {safeArticles.map((article: any) => (
-              <a
-                key={article.id}
-                href={`/blog/${article.slug}`}
+            {posts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/blog/${post.slug}`}
                 className="rounded-2xl border border-[#e2e8f0] bg-white p-6 transition-shadow hover:shadow-lg"
               >
                 <h2 className="text-lg font-bold text-[#0f172a]">
-                  {article.title}
+                  {post.h1 || post.seo_title || post.slug}
                 </h2>
-                <p className="mt-2 text-sm text-[#64748b]">
-                  {article.excerpt || ""}
-                </p>
+                {(post.excerpt || post.meta_description) && (
+                  <p className="mt-2 text-sm text-[#64748b]">
+                    {post.excerpt || post.meta_description}
+                  </p>
+                )}
+                {post.published_at && (
+                  <p className="mt-4 text-xs text-[#64748b]">
+                    Publié le {new Date(post.published_at).toLocaleDateString("fr-FR")}
+                  </p>
+                )}
                 <span className="mt-4 inline-block text-sm font-medium text-[#0ea5e9]">
                   Lire l’article
                 </span>
-              </a>
+              </Link>
             ))}
           </div>
         )}

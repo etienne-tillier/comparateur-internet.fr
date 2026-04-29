@@ -1,12 +1,11 @@
-// @ts-nocheck
 import { unstable_cache } from "next/cache";
 import { supabaseAdmin } from "./supabase";
 import { BlogPost } from "@/types";
 
 export type { BlogPost } from "@/types";
 
-const SITE_ID = process.env.SITE_ID?.trim() || null;
-const SITE_DOMAIN = (process.env.SITE_DOMAIN || "").replace(/^https?:\/\//, "");
+const SITE_ID = process.env.SITE_ID?.trim() || "b916601a-1c08-4d57-8b23-13b63c980959";
+const SITE_DOMAIN = (process.env.SITE_DOMAIN || "comparateur-internet.fr").replace(/^https?:\/\//, "");
 const CONTENT_CACHE_VERSION = process.env.CONTENT_CACHE_VERSION?.trim() || "v2";
 const SITE_CACHE_KEY = `${SITE_ID || SITE_DOMAIN || "unknown-site"}:${CONTENT_CACHE_VERSION}`;
 export const POSTS_PER_PAGE = 12;
