@@ -404,7 +404,7 @@ const getBlogPostBySlugCached = unstable_cache(
         const matchedTranslation = Object.entries(translations).find(([, value]) => {
             if (!value || typeof value !== "object") return false;
             const translatedSlug = (value as { slug?: unknown }).slug;
-            return typeof translatedSlug === "string" && translatedSlug === slug;
+            return typeof translatedSlug === "string" && translatedSlug === slug && translatedSlug !== post.slug;
         });
 
         if (!matchedTranslation) {
@@ -549,7 +549,7 @@ export async function getPostTranslations(post: BlogPost) {
     }
 
     Object.entries(translations).forEach(([locale, translation]) => {
-        if (translation.status === "published" && translation.slug) {
+        if (translation.status === "published" && translation.slug && translation.slug !== post.slug) {
             allTranslations[locale] = { slug: translation.slug };
         }
     });
